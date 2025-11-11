@@ -1,1 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buddy Chat - AIM Clone</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
 
+    <div class="buddy-list-container">
+        <div class="title-bar buddy-title-bar">
+            <div class="title-left">
+                Buddy List
+            </div>
+            <div class="title-buttons">
+                <div class="title-button minimize">—</div> 
+                <div class="title-button close">X</div>
+            </div>
+        </div>
+        <div class="buddy-list" id="buddy-list">
+            </div>
+
+        <div class="buddy-add-area">
+            <input type="text" id="new-buddy-name" placeholder="Enter buddy's Screen Name" class="input-field">
+            <button id="add-buddy-btn" class="send-button add-buddy-btn">Add Buddy</button>
+        </div>
+    </div>
+    
+    <div class="window-container">
+
+        <div class="title-bar">
+            <div class="title-left">
+                <img src="aim-logo.png" alt="AIM Logo" class="aim-logo">
+                Buddy Chat: Public Room
+            </div>
+            <div class="title-buttons">
+                <div class="title-button minimize">—</div> 
+                <div class="title-button maximize">□</div>
+                <div class="title-button close">X</div>
+            </div>
+        </div>
+
+        <div class="chat-window">
+            <div id="messages" class="messages">
+                <p>Welcome to the Public AIM Room!</p>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user" placeholder="Your Screen Name" class="input-field user-input" value="Guest">
+            
+            <input type="text" id="recipient" placeholder="Private Buddy Screen Name (Optional)" class="input-field user-input">
+
+            <textarea id="text" placeholder="Type your message here..." class="input-field text-input"></textarea>
+
+            <button id="send" class="send-button">Send</button>
+        </div>
+
+    </div>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
