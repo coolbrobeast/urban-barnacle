@@ -16,8 +16,6 @@ let db;
 // --- Middleware ---
 app.use(cors());
 app.use(express.json());
-
-// Serve all static files from "public"
 app.use(express.static(path.join(__dirname, "public")));
 
 // --- Database setup ---
@@ -27,6 +25,7 @@ async function initializeDatabase() {
     driver: sqlite3.Database,
   });
 
+  // Messages table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,6 +36,7 @@ async function initializeDatabase() {
     );
   `);
 
+  // Status table
   await db.exec(`
     CREATE TABLE IF NOT EXISTS status (
       user TEXT PRIMARY KEY,
@@ -48,53 +48,81 @@ async function initializeDatabase() {
   console.log("✅ Database ready");
 }
 
-// --- API routes ---
+// --- API Endpoints ---
+
+// Send a message
 app.post("/send", async (req, res) => {
   const { user, text, recipient } = req.body;
-  const time = new Date().toISOString();
   if (!user || !text) return res.status(400).send("User and text required");
 
-  await db.run(
-    "INSERT INTO messages (user, text, time, recipient) VALUES (?, ?, ?, ?)",
-    [user, text, time, recipient || ""]
-  );
-  res.sendStatus(200);
+  const time = new Date().toISOString();
+  try {
+    await db.run(
+      "INSERT INTO messages (user, text, time, recipient) VALUES (?, ?, ?, ?)",
+      [user, text, time, recipient || ""]
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error sending message");
+  }
 });
 
+// Fetch messages (public or private)
 app.get("/messages", async (req, res) => {
   const currentUser = req.query.user || "";
-  const msgs = await db.all(
-    `SELECT * FROM messages 
-     WHERE recipient = '' OR recipient = ? OR user = ?
-     ORDER BY id ASC`,
-    [currentUser, currentUser]
-  );
-  res.json(msgs);
+  try {
+    const msgs = await db.all(
+      `SELECT * FROM messages 
+       WHERE recipient = '' OR recipient = ? OR user = ?
+       ORDER BY id ASC`,
+      [currentUser, currentUser]
+    );
+    res.json(msgs);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching messages");
+  }
 });
 
+// Set user status
 app.post("/status", async (req, res) => {
   const { user, status, message } = req.body;
   if (!user || !status) return res.status(400).send("User and status required");
-  await db.run(
-    `INSERT OR REPLACE INTO status (user, status, message) VALUES (?, ?, ?)`,
-    [user, status, message || ""]
-  );
-  res.sendStatus(200);
+
+  try {
+    await db.run(
+      `INSERT OR REPLACE INTO status (user, status, message) VALUES (?, ?, ?)`,
+      [user, status, message || ""]
+    );
+    res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error setting status");
+  }
 });
 
+// Fetch statuses for multiple users
 app.get("/status", async (req, res) => {
   const userList = req.query.users;
   if (!userList) return res.json([]);
+
   const users = userList.split(",");
   const placeholders = users.map(() => "?").join(",");
-  const statuses = await db.all(
-    `SELECT user, status, message FROM status WHERE user IN (${placeholders})`,
-    users
-  );
-  res.json(statuses);
+
+  try {
+    const statuses = await db.all(
+      `SELECT user, status, message FROM status WHERE user IN (${placeholders})`,
+      users
+    );
+    res.json(statuses);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching statuses");
+  }
 });
 
-// --- Root route ---
+// --- Serve frontend ---
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
