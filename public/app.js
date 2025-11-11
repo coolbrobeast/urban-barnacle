@@ -2,7 +2,7 @@
 
 // --- CONFIGURATION ---
 // !! CRITICAL: Ensure this URL is correct and your ngrok tunnel is running !!
-const SERVER_URL = "https://nondiffractive-megan-petechial.ngrok-free.dev"; 
+const SERVER_URL = ""; 
 
 // --- BUDDY LIST DATA & POLLING ---
 const BUDDY_LIST = ['Guest', 'Buddy1', 'TestUser']; // The list of friends to check status for
@@ -329,4 +329,5 @@ document.addEventListener('DOMContentLoaded', () => {
     startStatusPolling();
 
     console.log('UI wiring complete — status dropdown should be visible now.');
+
 });
