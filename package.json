@@ -1,4 +1,7 @@
 {
+  "scripts": {
+  "start": "node server.js"
+}
   "name": "aim-clone",
   "version": "1.0.0",
   "type": "module",
